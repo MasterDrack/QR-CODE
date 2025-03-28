@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولد QR كود</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        input[type="text"], input[type="color"] {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #qrImage {
+            width: 150px;  /* ✅ تصغير حجم QR Code */
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border: 3px solid #007BFF;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        #downloadLink {
+            display: none;
+            text-decoration: none;
+        }
+
+        #downloadLink button {
+            background: #28a745;
+        }
+
+        #downloadLink button:hover {
+            background: #1e7e34;
+        }
+    </style>
+    <script>
+        async function generateQR() {
+            let data = document.getElementById("text").value;
+            let color = document.getElementById("color").value;
+            let bgColor = document.getElementById("bgColor").value;
+
+            let response = await fetch('http://127.0.0.1:5000/generate_qr', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ data, color, bg_color: bgColor })
+            });
+
+            let blob = await response.blob();
+            let img = document.getElementById("qrImage");
+            let downloadLink = document.getElementById("downloadLink");
+
+            let qrURL = URL.createObjectURL(blob);
+            img.src = qrURL;
+            img.style.display = "block";
+
+            // تمكين زر التحميل
+            downloadLink.href = qrURL;
+            downloadLink.style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>مولد QR كود مخصص</h2>
+        <input type="text" id="text" placeholder="أدخل الرابط">
+        <input type="color" id="color" value="#000000">
+        <input type="color" id="bgColor" value="#ffffff">
+        <button onclick="generateQR()">إنشاء QR</button>
+        <br>
+        <img id="qrImage" style="display:none;">
+        <a id="downloadLink" download="qrcode.png">
+            <button>تحميل QR</button>
+        </a>
+    </div>
+</body>
+</html>
+
